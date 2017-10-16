@@ -90,6 +90,7 @@ public class PhotoViewAttacher implements View.OnTouchListener,
 
     private boolean mZoomEnabled = true;
     private ScaleType mScaleType = ScaleType.FIT_CENTER;
+    private TranslateType mTranslateType = TranslateType.CENTER;
 
     private OnGestureListener onGestureListener = new OnGestureListener() {
         @Override
@@ -501,6 +502,16 @@ public class PhotoViewAttacher implements View.OnTouchListener,
         }
     }
 
+    /**
+     * Sets the {@link TranslateType} that will be used in conjunction with this {@link PhotoViewAttacher}'s {@link ScaleType}
+     * to determine how the image will be offset in the viewport. This only works with {@link ScaleType}s CENTER and CENTER_CROP.
+     *
+     * @param translateType - The {@link TranslateType} to use.
+     */
+    public void setTranslateType(TranslateType translateType) {
+        mTranslateType = translateType;
+    }
+
     public boolean isZoomable() {
         return mZoomEnabled;
     }
@@ -631,15 +642,32 @@ public class PhotoViewAttacher implements View.OnTouchListener,
         final float heightScale = viewHeight / drawableHeight;
 
         if (mScaleType == ScaleType.CENTER) {
-            mBaseMatrix.postTranslate((viewWidth - drawableWidth) / 2F,
-                    (viewHeight - drawableHeight) / 2F);
-
+            switch (mTranslateType) {
+                case TOP:
+                    mBaseMatrix.postTranslate((viewWidth - drawableWidth) / 2F, 0);
+                    break;
+                case CENTER:
+                    mBaseMatrix.postTranslate((viewWidth - drawableWidth) / 2F, (viewHeight - drawableHeight) / 2F);
+                    break;
+                case BOTTOM:
+                    mBaseMatrix.postTranslate((viewWidth - drawableWidth) / 2F, (viewHeight - drawableHeight));
+                    break;
+            }
         } else if (mScaleType == ScaleType.CENTER_CROP) {
             float scale = Math.max(widthScale, heightScale);
             mBaseMatrix.postScale(scale, scale);
-            mBaseMatrix.postTranslate((viewWidth - drawableWidth * scale) / 2F,
-                    (viewHeight - drawableHeight * scale) / 2F);
 
+            switch (mTranslateType) {
+                case TOP:
+                    mBaseMatrix.postTranslate((viewWidth - drawableWidth * scale) / 2F, 0);
+                    break;
+                case CENTER:
+                    mBaseMatrix.postTranslate((viewWidth - drawableWidth * scale) / 2F, (viewHeight - drawableHeight * scale) / 2F);
+                    break;
+                case BOTTOM:
+                    mBaseMatrix.postTranslate((viewWidth - drawableWidth * scale) / 2F, (viewHeight - drawableHeight * scale));
+                    break;
+            }
         } else if (mScaleType == ScaleType.CENTER_INSIDE) {
             float scale = Math.min(1.0f, Math.min(widthScale, heightScale));
             mBaseMatrix.postScale(scale, scale);

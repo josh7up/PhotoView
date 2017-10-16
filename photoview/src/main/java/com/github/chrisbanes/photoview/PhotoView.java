@@ -105,6 +105,16 @@ public class PhotoView extends ImageView {
         }
     }
 
+    /**
+     * Sets the {@link TranslateType} that will be used in conjunction with this {@link PhotoView}'s {@link ScaleType}
+     * to determine how the image will be offset in the viewport. This only works with {@link ScaleType}s CENTER and CENTER_CROP.
+     *
+     * @param translateType - The {@link TranslateType} to use.
+     */
+    public void setTranslateType(TranslateType translateType) {
+        attacher.setTranslateType(translateType);
+    }
+
     @Override
     public void setImageDrawable(Drawable drawable) {
         super.setImageDrawable(drawable);
