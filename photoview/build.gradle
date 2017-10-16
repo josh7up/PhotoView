@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion rootProject.ext.sdkVersion
@@ -17,3 +18,70 @@ dependencies {
 }
 
 apply from: 'https://raw.githubusercontent.com/Commit451/gradle-android-javadocs/1.0.0/gradle-android-javadocs.gradle'
+
+def myGroupId = 'com.github.josh7up'
+def myArtifactId = 'PhotoView'
+def myVersionNumber = '2.1.4'
+def myUsername = 'josh7up'
+def myGitUrl = 'https://github.com/josh7up/PhotoView'
+
+group = myGroupId
+version = myVersionNumber
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name myArtifactId
+            description 'Implementation of ImageView for Android that supports zooming, by various touch gestures.'
+            url myGitUrl
+            inceptionYear '2017'
+
+            packaging 'aar'
+            groupId myGroupId
+            artifactId myArtifactId
+            version myVersionNumber
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection "${myGitUrl}.git"
+                url myGitUrl
+
+            }
+            developers {
+                developer {
+                    id = myUsername
+                    name 'Josh'
+                }
+            }
+        }
+    }
+}
+
+Properties bintrayProperties = new Properties()
+bintrayProperties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+
+bintray {
+    user = bintrayProperties.getProperty('user')
+    key = bintrayProperties.get('key')
+    configurations = ['archives']
+    pkg {
+        repo = 'android'
+        name = myArtifactId
+        userOrg = myUsername
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/bintray/gradle-bintray-plugin.git'
+        publish = true
+        version {
+            name = myVersionNumber
+            desc = "${myArtifactId} ${myVersionNumber}"
+            released = new Date()
+            vcsTag = 'v${myVersionNumber}'
+        }
+    }
+}
