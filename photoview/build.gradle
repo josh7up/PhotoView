@@ -21,12 +21,14 @@ apply from: 'https://raw.githubusercontent.com/Commit451/gradle-android-javadocs
 
 def myGroupId = 'com.github.josh7up'
 def myArtifactId = 'PhotoView'
-def myVersionNumber = '2.1.4'
+def myVersionNumber = '2.1.5'
 def myUsername = 'josh7up'
 def myGitUrl = 'https://github.com/josh7up/PhotoView'
 
 group = myGroupId
 version = myVersionNumber
+// Important for ensuring this library project is not uploaded to bintray as a sub-project.
+archivesBaseName = myArtifactId
 
 install {
     repositories.mavenInstaller {
@@ -73,7 +75,6 @@ bintray {
     pkg {
         repo = 'android'
         name = myArtifactId
-        userOrg = myUsername
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/bintray/gradle-bintray-plugin.git'
         publish = true
@@ -81,7 +82,7 @@ bintray {
             name = myVersionNumber
             desc = "${myArtifactId} ${myVersionNumber}"
             released = new Date()
-            vcsTag = 'v${myVersionNumber}'
+            vcsTag = myVersionNumber
         }
     }
 }
