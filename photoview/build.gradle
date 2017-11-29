@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion rootProject.ext.sdkVersion
@@ -14,75 +13,41 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:support-core-utils:$supportLibVersion"
+    implementation "com.android.support:support-core-utils:$supportLibVersion"
 }
 
-apply from: 'https://raw.githubusercontent.com/Commit451/gradle-android-javadocs/1.0.0/gradle-android-javadocs.gradle'
+apply from: 'https://raw.githubusercontent.com/josh7up/AndroidMavenBintray/1.0.1/gradle-maven-bintray.gradle'
 
-def myGroupId = 'com.github.josh7up'
-def myArtifactId = 'PhotoView'
-def myVersionNumber = '2.1.5'
-def myUsername = 'josh7up'
-def myGitUrl = 'https://github.com/josh7up/PhotoView'
+def groupId = 'com.github.josh7up'
+def artifactId = 'PhotoView'
+def versionNumber = '2.1.7'
+def gitUrl = 'https://github.com/josh7up/PhotoView'
 
-group = myGroupId
-version = myVersionNumber
-// Important for ensuring this library project is not uploaded to bintray as a sub-project.
-archivesBaseName = myArtifactId
+configureMavenInstall([
+        groupId: groupId,
+        artifactId: artifactId,
+        versionNumber: versionNumber,
+        developerId: 'josh7up',
+        gitUrl: gitUrl,
+        projectDescription: 'Implementation of ImageView for Android that supports zooming, by various touch gestures.',
+        projectInceptionYear: 2017,
+        licenseName: 'The Apache Software License, Version 2.0',
+        licenseUrl: 'http://www.apache.org/licenses/LICENSE-2.0.txt',
+        developerName: 'Josh Feldman'
+])
 
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            name myArtifactId
-            description 'Implementation of ImageView for Android that supports zooming, by various touch gestures.'
-            url myGitUrl
-            inceptionYear '2017'
-
-            packaging 'aar'
-            groupId myGroupId
-            artifactId myArtifactId
-            version myVersionNumber
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-            scm {
-                connection "${myGitUrl}.git"
-                url myGitUrl
-
-            }
-            developers {
-                developer {
-                    id = myUsername
-                    name 'Josh'
-                }
-            }
-        }
-    }
-}
-
+File bintrayPropertiesFile = project.rootProject.file('bintray.properties')
 Properties bintrayProperties = new Properties()
-bintrayProperties.load(project.rootProject.file('bintray.properties').newDataInputStream())
-
-bintray {
-    user = bintrayProperties.getProperty('user')
-    key = bintrayProperties.get('key')
-    configurations = ['archives']
-    pkg {
-        repo = 'android'
-        name = myArtifactId
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/bintray/gradle-bintray-plugin.git'
-        publish = true
-        version {
-            name = myVersionNumber
-            desc = "${myArtifactId} ${myVersionNumber}"
-            released = new Date()
-            vcsTag = myVersionNumber
-        }
-    }
+if (bintrayPropertiesFile.exists()) {
+    bintrayProperties.load(bintrayPropertiesFile.newDataInputStream())
 }
+
+configureBintrayUpload(
+        user: bintrayProperties.getProperty('user', null),
+        key: bintrayProperties.getProperty('key', null),
+        repoName: 'android',
+        artifactId: artifactId,
+        licenseId: 'Apache-2.0',
+        gitUrl: gitUrl,
+        versionNumber: versionNumber
+)
